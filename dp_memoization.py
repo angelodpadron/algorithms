@@ -237,21 +237,131 @@ def best_sum_m(target, nums, memo = {}):
 # can construct problem
 
 # brute force approach
-# blabla
-# blabla
+# O(n^m * m) time complexity, beign m the target length, and n the wordbank length
+# O(m^2) space complexity
 
-def can_construct_bf(target, wordBank):
+def can_construct_bf(target, wordbank):
 
     if not target:
         return True
 
-    for word in wordBank:
+    for word in wordbank:
         if word[0] == target[0] and word in target:
             suffix = target[len(word):]
-            if can_construct_bf(suffix, wordBank):
+            if can_construct_bf(suffix, wordbank):
                 return True
     
     return False
 
+# memoization approach
+# O(n * m^2) time complexity
+# O(m^2) space complexity
 
-print(can_construct_bf("abcdabf", ["ab","c","e","d"]))
+def can_construct_m(target, wordbank, memo = {}):
+
+    if target in memo:
+        return memo[target]
+    
+    if not target:
+        return True
+
+    memo[target] = False
+
+    for word in wordbank:
+        if word[0] == target[0] and word in target:
+            suffix = target[len(word):]
+            if can_construct_m(suffix, wordbank, memo):
+                memo[target] = True
+                break
+    
+    return memo[target]
+
+
+
+# count construct problem
+
+# brute force approach
+# O(n^m * m) time complexity
+# O(m^2) space complexity
+
+def count_construct_bf(target, wordbank):
+
+    if not target:
+        return 1
+
+    count = 0
+
+    for word in wordbank:
+        if word[0] == target[0] and word in target:
+            suffix = target[len(word):]
+            count += count_construct_bf(suffix, wordbank)
+    
+    return count
+
+# memoization approach
+# O(n * m^2) time complexity
+# O(m^2) space complexity
+
+def count_construct_m(target, wordbank, memo = {}):
+    
+    if target in memo:
+        return memo[target]
+
+    if not target:
+        return 1
+    
+    memo[target] = 0
+    
+    for word in wordbank:
+        if word[0] == target[0] and word in target:
+            suffix = target[len(word):]
+            memo[target] += count_construct_m(suffix, wordbank, memo)
+    
+    return memo[target]
+
+
+# all construct problem
+
+# brute force approach
+
+def all_construct_bf(target, wordbank):
+
+    if not target:
+        return [[]]
+
+    result = []
+
+    for word in wordbank:
+        if word[0] == target[0] and word in target:
+            suffix = target[len(word):]
+            suffix_list = all_construct_bf(suffix, wordbank)
+            target_list = [[word] + sl for sl in suffix_list]   # adds the current word at the top of every sublist
+            result.extend(target_list)
+
+    return result
+
+# memoization approach
+# O(n^m) time complexity
+# O(m) space complexity
+
+def all_construct_m(target, wordbank, memo = {}):
+
+    if target in memo:
+        return memo[target]
+
+    if not target:
+        return [[]]
+
+    result = []
+
+    for word in wordbank:
+        if word[0] == target[0] and word in target:
+            suffix = target[len(word):]
+            suffix_list = all_construct_m(suffix, wordbank)
+            target_list = [[word] + sl for sl in suffix_list]   # adds the current word at the top of every sublist
+            memo[target] = target_list
+            result.extend(target_list)
+
+    return result
+
+
