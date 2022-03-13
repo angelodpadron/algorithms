@@ -26,6 +26,22 @@ def fib_m(n, memo = None):
 
     return memo[n]
 
+# tabulation approach
+# O(n) time complexity
+# O(n) space complexity
+
+def fib_t(n):
+
+    table = [0] * (n + 2)
+
+    table[1] = 1
+
+    for i in range(n):
+        table[i + 1] += table[i]
+        table[i + 2] += table[i]
+
+    return table[n]
+
 
 # grid traveler problem
 
@@ -66,7 +82,28 @@ def grid_traveler_m(n, m, memo = {}):
 
     return memo[key]
 
-# print(grid_traveler_m(100,100))
+# print(grid_traveler_m(13,13))
+
+# tabulation approach
+# O(n) time complexity
+# O(n) space complexity
+
+def grid_traveler_t(n, m):
+
+    table = [[0] * (m + 1) for _ in [0] * (n + 1)]
+
+    table[1][1] = 1
+
+    for row in range(n + 1):
+        for col in range(m + 1):
+            if (row + 1 <= n):
+                table[row + 1][col] += table[row][col]
+            if (col + 1 <= m):
+                table[row][col + 1] += table[row][col]
+    
+    return table[n][m]
+
+# print(grid_traveler_t(13,13))
 
 
 # can sum problem 
@@ -89,7 +126,7 @@ def can_sum_bf(target, nums):
 
     return False
 
-# print(can_sum_bf(28, [7,14]))
+# print(can_sum_bf(300, [7, 14]))
 
 # memoize approach
 # O(m * n) time complexity, same variables as before
@@ -115,7 +152,26 @@ def can_sum_m(target, nums, memo = {}):
 
     return memo[target]
 
-# print(can_sum_m(3000, [7,14]))
+# print(can_sum_m(300, [7, 14]))
+
+# tabulation approach
+# O(n*m) time complexity
+# O(m) space complexity
+
+def can_sum_t(target, nums):
+    
+    table = [False] * (target + 1)
+    table[0] = True
+
+    for i in range(target + 1):
+        if table[i]:
+            for num in nums:
+                if (i + num) < len(table):
+                    table[i + num] = True
+
+    return table[target]
+
+# print(can_sum_t(300, [7, 14]))
 
 
 # how to sum problem
@@ -169,6 +225,26 @@ def how_sum_m(target, nums, memo = {}):
     return memo[target]
 
 # print(how_sum_m(600, [7,14]))
+
+# tabulation approach
+# O(m * n) time complexity
+# O(m^2) space complexity
+
+def how_sum_t(target, nums):
+
+    table = [None] * (target + 1)
+
+    table[0] = []
+
+    for i in range(target + 1):
+        if table[i] != None:
+            for num in nums:
+                if (i + num) < len(table):
+                    table[i + num] = table[i] + [num]
+
+    return table[target]
+
+# print(how_sum_t(3000, [15]))
 
 
 # best sum problem
@@ -233,6 +309,29 @@ def best_sum_m(target, nums, memo = {}):
 
 # print(best_sum_m(675, [5,20,50,100,200]))
 
+# tabulation approach
+# O(m^2 * n) time complexity
+# O(m^2) space complexity 
+
+def best_sum_t(target, nums):
+    
+    table = [None] * (target + 1)
+    table[0] = []
+
+    for i in range(target + 1):
+        if table[i] != None:
+            for num in nums:
+                if i + num < len(table):
+                    combination = table[i] + [num]
+                    if table[i + num] == None or len(table[i + num]) > len(combination):
+                        table[i + num] = combination
+
+    
+
+    return table[target]
+
+# print(best_sum_t(675, [5,20,50,100,200]))
+
 
 # can construct problem
 
@@ -246,12 +345,14 @@ def can_construct_bf(target, wordbank):
         return True
 
     for word in wordbank:
-        if word[0] == target[0] and word in target:
+        if word[0] == target[0] and target[0 : len(word)] == word:
             suffix = target[len(word):]
             if can_construct_bf(suffix, wordbank):
                 return True
     
     return False
+
+# print(can_construct_bf(("a" * 20) + "cho", ["a", "aa","aaa", "aaaa", "aaaaa", "aaaaaaaa", "aaaaaaaaaaa", "c", "ch", "iz"]))
 
 # memoization approach
 # O(n * m^2) time complexity
@@ -268,7 +369,7 @@ def can_construct_m(target, wordbank, memo = {}):
     memo[target] = False
 
     for word in wordbank:
-        if word[0] == target[0] and word in target:
+        if word[0] == target[0] and target[0 : len(word)] == word:
             suffix = target[len(word):]
             if can_construct_m(suffix, wordbank, memo):
                 memo[target] = True
@@ -276,7 +377,26 @@ def can_construct_m(target, wordbank, memo = {}):
     
     return memo[target]
 
+# print(can_construct_m(("a" * 20) + "cho", ["a", "aa","aaa", "aaaa", "aaaaa", "aaaaaaaa", "aaaaaaaaaaa", "c", "ch", "iz"]))
 
+# tabulation approach
+# O(m^2 * n) time complexity
+# O(m) space complexity
+
+def can_construct_t(target, wordbank):
+
+    table = [False] * (len(target) + 1)
+    table [0] = True
+
+    for i in range(len(target) + 1):
+        if table[i]:
+            for word in wordbank:
+                if target[i: i + len(word)] == word:
+                    table[i + len(word)] = True
+    
+    return table[len(target)]
+
+# print(can_construct_t(("a" * 20) + "cho", ["a", "aa","aaa", "aaaa", "aaaaa", "aaaaaaaa", "aaaaaaaaaaa", "c", "ch", "iz"]))
 
 # count construct problem
 
@@ -292,14 +412,16 @@ def count_construct_bf(target, wordbank):
     count = 0
 
     for word in wordbank:
-        if word[0] == target[0] and word in target:
+        if word[0] == target[0] and target[0 : len(word)] == word:
             suffix = target[len(word):]
             count += count_construct_bf(suffix, wordbank)
     
     return count
 
+# print(count_construct_bf("enterapotentpot", ["a", "p", "ent", "enter", "ot", "o", "t"]))
+
 # memoization approach
-# O(n * m^2) time complexity
+# O(m^2 * n) time complexity
 # O(m^2) space complexity
 
 def count_construct_m(target, wordbank, memo = {}):
@@ -313,11 +435,32 @@ def count_construct_m(target, wordbank, memo = {}):
     memo[target] = 0
     
     for word in wordbank:
-        if word[0] == target[0] and word in target:
+        if word[0] == target[0] and target[0 : len(word)] == word:
             suffix = target[len(word):]
             memo[target] += count_construct_m(suffix, wordbank, memo)
     
     return memo[target]
+
+# print(count_construct_m("enterapotentpot", ["a", "p", "ent", "enter", "ot", "o", "t"]))
+
+# tabulation approach
+# O(m^2 * n) time complexity
+# O(m) space complexity
+
+def count_construct_t(target, wordbank):
+    
+    table = [0] * (len(target) + 1)
+    table[0] = 1
+
+    for i in range(len(target) + 1):
+        if table[i]:
+            for word in wordbank:
+                if target[i: i + len(word)] == word:
+                    table[i + len(word)] += table[i]
+    # print(table)
+    return table[len(target)]
+
+# print(count_construct_t("enterapotentpot", ["a", "p", "ent", "enter", "ot", "o", "t"]))
 
 
 # all construct problem
@@ -332,13 +475,15 @@ def all_construct_bf(target, wordbank):
     result = []
 
     for word in wordbank:
-        if word[0] == target[0] and word in target:
-            suffix = target[len(word):]
+        if word[0] == target[0] and target[0 : len(word)] == word:
+            suffix = target[len(word):] # O(k) time complexity
             suffix_list = all_construct_bf(suffix, wordbank)
             target_list = [[word] + sl for sl in suffix_list]   # adds the current word at the top of every sublist
-            result.extend(target_list)
+            result.extend(target_list) # O(k) time complexity
 
     return result
+
+# print(all_construct_bf("purple", ["p", "purp", "ur", "le", "purpl"]))
 
 # memoization approach
 # O(n^m) time complexity
@@ -355,7 +500,7 @@ def all_construct_m(target, wordbank, memo = {}):
     result = []
 
     for word in wordbank:
-        if word[0] == target[0] and word in target:
+        if word[0] == target[0] and target[0 : len(word)] == word:
             suffix = target[len(word):]
             suffix_list = all_construct_m(suffix, wordbank)
             target_list = [[word] + sl for sl in suffix_list]   # adds the current word at the top of every sublist
@@ -364,4 +509,23 @@ def all_construct_m(target, wordbank, memo = {}):
 
     return result
 
+# print(all_construct_m("purple", ["p", "purp", "ur", "le", "purpl"]))
 
+# tabulation approach
+# O(n^m) time complexity
+# O(n^m) space complexity
+
+def all_construct_t(target, wordbank):
+
+    table = [[] for _ in range(len(target) + 1)]
+    table[0] = [[]]
+
+    for i in range(len(table) + 1):
+        for word in wordbank:
+            if target[i: i + len(word)] == word:
+                combinations = [sl + [word] for sl in table[i]]
+                table[i + len(word)].extend(combinations)
+
+    return table[len(target)]            
+
+# print(all_construct_t("purple", ["p", "purp", "ur", "le", "purpl"]))
